@@ -1,5 +1,5 @@
 import {model, Model, property} from '@loopback/repository';
-import {VoucherRequestType} from '.';
+import {VoucherRequestType} from './voucher.type';
 
 @model()
 export class IncenitveRequestType extends Model {
