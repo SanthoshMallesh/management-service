@@ -9,7 +9,7 @@ export class CampaignController {
 
   @get('/')
   async list() {
-    const campaign = await Campaign.findOne();
+    const campaign = await Campaign.findAll();
     return campaign;
   }
 }

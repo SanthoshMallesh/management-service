@@ -1,18 +1,27 @@
 import {
+  BelongsTo,
   Column,
   CreatedAt,
   DataType,
   Default,
+  ForeignKey,
+  HasOne,
   Model,
   Table,
   UpdatedAt,
 } from 'sequelize-typescript';
+import {Campaign} from '.';
+import {Voucher} from './voucher.model';
 
 @Table({
-  tableName: 'campaign',
+  tableName: 'incentive',
   timestamps: true,
 })
-export class Campaign extends Model<Campaign> {
+export class Incentive extends Model<Incentive> {
+  @ForeignKey(() => Campaign)
+  @Column
+  campaignId: number;
+
   @Column
   name: string;
 
@@ -26,13 +35,13 @@ export class Campaign extends Model<Campaign> {
   endDateTime: Date;
 
   @Column
-  campaignType: string;
-
-  @Column
-  budgetAmount: number;
+  incentiveType: string;
 
   @Column
   workFlowStatus: number;
+
+  @Column
+  distributionType: string;
 
   @Default(false)
   @Column
@@ -40,9 +49,6 @@ export class Campaign extends Model<Campaign> {
 
   @Column(DataType.JSON)
   errorDescription: JSON;
-
-  @Column
-  incentiveCount: number;
 
   @Column
   createdBy: string;
@@ -55,4 +61,10 @@ export class Campaign extends Model<Campaign> {
 
   @UpdatedAt
   updatedDate: Date;
+
+  @BelongsTo(() => Campaign)
+  campaign: Campaign;
+
+  @HasOne(() => Voucher)
+  voucher: Voucher;
 }

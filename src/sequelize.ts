@@ -1,7 +1,15 @@
 import * as SequelizeModel from 'sequelize';
 import {Sequelize, SequelizeOptions} from 'sequelize-typescript';
 import {DB_CONFIG} from './config';
-import {Campaign} from './models';
+import {
+  Campaign,
+  CampaignChannel,
+  Channel,
+  District,
+  Incentive,
+  Locale,
+  Voucher,
+} from './models';
 
 export default class SequelizeDB {
   static connect() {
@@ -37,7 +45,15 @@ export default class SequelizeDB {
       options,
     );
 
-    sequelize.addModels([Campaign]);
+    sequelize.addModels([
+      Locale,
+      District,
+      Channel,
+      Campaign,
+      CampaignChannel,
+      Incentive,
+      Voucher,
+    ]);
 
     return sequelize;
   }
