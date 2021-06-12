@@ -6,6 +6,7 @@ import {
   ForeignKey,
   Model,
   Table,
+  UpdatedAt,
 } from 'sequelize-typescript';
 import {Campaign, Channel} from '.';
 
@@ -35,7 +36,7 @@ export class CampaignChannel extends Model<CampaignChannel> {
   @Column
   updatedBy: string;
 
-  @CreatedAt
+  @UpdatedAt
   updatedDate: Date;
 
   @BelongsTo(() => Campaign)
