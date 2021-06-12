@@ -7,6 +7,7 @@ export class CampaignErrorCode extends DefaultErrorCode {
     INCENTIVE_COUNT_REQUIRED: 'Incentive required',
     CAMPAIGN_TYPE_REQUIRED: 'Campaign type required',
     BUDGET_AMOUNT_REQUIRED: 'Budget amount required',
-    CAMPAIGN_NOT_FOUND: 'Campaign %d not found',
+    DRAFT_CAMPAIGNS_NOT_FOUND: 'Campaign %s should be in draft status',
+    CAMPAIGNS_REQUIRED: 'Campaign is required',
   };
 }

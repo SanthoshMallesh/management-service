@@ -1,6 +1,11 @@
 import {model, Model, property} from '@loopback/repository';
 
 @model()
+export class CampaignDeleteRequestType extends Model {
+  @property.array(Number)
+  ids?: number[];
+}
+@model()
 export class CampaignRequestType extends Model {
   @property.array(Number)
   channels: number[];

@@ -6,7 +6,7 @@ export function campaignScopes() {
       include: [
         {
           as: 'channels',
-          attributes: ['id'],
+          attributes: ['id', 'name'],
           model: Channel,
           required: true,
         },

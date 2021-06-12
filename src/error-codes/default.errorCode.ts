@@ -5,6 +5,8 @@ export class DefaultErrorCode {
   static readonly errorMessages: {[index: string]: string} = {
     START_DATE_REQUIRED: 'Start date is required',
     END_DATE_REQUIRED: 'End date is required',
+    UPDATE_EXPIRED_CAMPAIGN: 'Campaign %d can not be updated in %s state',
+    CAMPAIGN_NOT_FOUND: 'Campaign %d not found',
   };
 
   static readonly errorCodes: {[index: string]: number} = {};

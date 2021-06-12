@@ -8,6 +8,8 @@ import {
 } from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
+/* Constant */
+import {Constants} from './constants';
 import sequelize from './sequelize';
 import {MySequence} from './sequence';
 import {CorrelationIdProvider} from './utils/correlationId-provider';
@@ -31,6 +33,9 @@ export class ManagementServiceApplication extends BootMixin(
 
     //Correlation Id Provider
     this.bind('provider.correlationId').toClass(CorrelationIdProvider);
+
+    //Bind Constant
+    this.bind('constants').toClass(Constants);
 
     //Logger
     Logger.initiateLogger();
