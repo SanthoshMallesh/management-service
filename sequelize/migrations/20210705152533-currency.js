@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('incentive', {
+    return queryInterface.createTable('currency', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,36 +12,15 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
       },
-      startDateTime: {
-        type: Sequelize.DATE,
-      },
-      endDateTime: {
-        type: Sequelize.DATE,
-      },
-      incentiveType: {
+      code: {
         type: Sequelize.STRING,
       },
-      description: {
-        type: Sequelize.TEXT,
-      },
-      campaignId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'campaign',
-          key: 'id',
-        },
-      },
-      workFlowStatus: {
-        type: Sequelize.INTEGER,
-      },
-      distributionType: {
+      symbol: {
         type: Sequelize.STRING,
       },
-      isValid: {
+      enabled: {
         type: Sequelize.BOOLEAN,
-      },
-      errorDescription: {
-        type: Sequelize.JSON,
+        defaultValue: true,
       },
       createdBy: {
         type: Sequelize.STRING,
@@ -54,12 +33,13 @@ module.exports = {
         type: Sequelize.STRING,
       },
       updatedDate: {
+        allowNull: false,
         type: Sequelize.DATE,
       },
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('incentive');
+    return queryInterface.dropTable('currency');
   },
 };

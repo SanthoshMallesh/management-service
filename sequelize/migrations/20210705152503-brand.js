@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('channel', {
+    return queryInterface.createTable('brand', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,15 +12,8 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
       },
-      districtId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'district',
-          key: 'id',
-        },
-      },
-      description: {
-        type: Sequelize.TEXT,
+      isMultiBrandType: {
+        type: Sequelize.BOOLEAN,
       },
       enabled: {
         type: Sequelize.BOOLEAN,
@@ -29,20 +22,21 @@ module.exports = {
       createdBy: {
         type: Sequelize.STRING,
       },
+      updatedBy: {
+        type: Sequelize.STRING,
+      },
       createdDate: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      updatedBy: {
-        type: Sequelize.STRING,
-      },
       updatedDate: {
+        allowNull: false,
         type: Sequelize.DATE,
       },
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('channel');
+    return queryInterface.dropTable('brand');
   },
 };

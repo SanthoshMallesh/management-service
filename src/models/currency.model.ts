@@ -1,24 +1,29 @@
 import {
-  BelongsTo,
   Column,
   CreatedAt,
-  ForeignKey,
+  Default,
   Model,
   Table,
+  UpdatedAt,
 } from 'sequelize-typescript';
-import {Locale} from '.';
 
 @Table({
-  tableName: 'district',
+  tableName: 'currency',
   timestamps: true,
 })
-export class District extends Model<District> {
+export class Currency extends Model<Currency> {
   @Column
   name: string;
 
-  @ForeignKey(() => Locale)
   @Column
-  localeId: number;
+  code: string;
+
+  @Column
+  symbol: string;
+
+  @Default(true)
+  @Column
+  enabled: boolean;
 
   @Column
   createdBy: string;
@@ -29,9 +34,6 @@ export class District extends Model<District> {
   @Column
   updatedBy: string;
 
-  @CreatedAt
+  @UpdatedAt
   updatedDate: Date;
-
-  @BelongsTo(() => Locale)
-  locale: Locale;
 }

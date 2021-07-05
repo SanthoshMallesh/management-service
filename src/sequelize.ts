@@ -2,12 +2,18 @@ import * as SequelizeModel from 'sequelize';
 import {Sequelize, SequelizeOptions} from 'sequelize-typescript';
 import {DB_CONFIG} from './config';
 import {
+  AppConfig,
+  Brand,
   Campaign,
   CampaignChannel,
   Channel,
-  District,
+  Country,
+  Currency,
+  FieldConfig,
   Incentive,
   Locale,
+  MarketingProgram,
+  TimeZone,
   Voucher,
 } from './models';
 
@@ -46,13 +52,19 @@ export default class SequelizeDB {
     );
 
     sequelize.addModels([
-      Locale,
-      District,
-      Channel,
+      AppConfig,
       Campaign,
       CampaignChannel,
+      Channel,
+      Country,
+      FieldConfig,
       Incentive,
+      Locale,
       Voucher,
+      Brand,
+      Currency,
+      MarketingProgram,
+      TimeZone,
     ]);
 
     return sequelize;

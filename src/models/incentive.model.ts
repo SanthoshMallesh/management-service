@@ -10,9 +10,7 @@ import {
   Table,
   UpdatedAt,
 } from 'sequelize-typescript';
-import {Campaign} from '.';
-import {Voucher} from './voucher.model';
-
+import {Campaign, Voucher} from '.';
 @Table({
   tableName: 'incentive',
   timestamps: true,

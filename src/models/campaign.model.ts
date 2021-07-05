@@ -5,13 +5,14 @@ import {
   CreatedAt,
   DataType,
   Default,
+  ForeignKey,
   HasMany,
   Model,
   Scopes,
   Table,
   UpdatedAt,
 } from 'sequelize-typescript';
-import {CampaignChannel, Channel, Incentive} from '.';
+import {CampaignChannel, Channel, Incentive, TimeZone} from '.';
 import {campaignScopes} from '../scopes';
 
 @Table({
@@ -51,6 +52,10 @@ export class Campaign extends Model<Campaign> {
   @Column
   incentiveCount: number;
 
+  @ForeignKey(() => TimeZone)
+  @Column
+  timeZoneId: number;
+
   @Column
   createdBy: string;
 
@@ -74,4 +79,7 @@ export class Campaign extends Model<Campaign> {
 
   @BelongsToMany(() => Channel, () => CampaignChannel)
   channels: Channel[];
+
+  @BelongsTo(() => TimeZone)
+  timeZone: TimeZone;
 }

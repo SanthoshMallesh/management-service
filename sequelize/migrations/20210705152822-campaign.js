@@ -39,6 +39,13 @@ module.exports = {
       incentiveCount: {
         type: Sequelize.INTEGER,
       },
+      timeZoneId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'time_zone',
+          key: 'id',
+        },
+      },
       createdBy: {
         type: Sequelize.STRING,
       },

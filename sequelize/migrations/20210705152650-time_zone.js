@@ -2,22 +2,32 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('district', {
+    return queryInterface.createTable('time_zone', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
+      timeZoneName: {
         type: Sequelize.STRING,
       },
-      localeId: {
+      countryId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'locale',
+          model: 'country',
           key: 'id',
         },
+      },
+      gtmOffset: {
+        type: Sequelize.STRING,
+      },
+      timeZone: {
+        type: Sequelize.STRING,
+      },
+      enabled: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
       createdBy: {
         type: Sequelize.STRING,
@@ -30,12 +40,13 @@ module.exports = {
         type: Sequelize.STRING,
       },
       updatedDate: {
+        allowNull: false,
         type: Sequelize.DATE,
       },
     });
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('district');
+    return queryInterface.dropTable('time_zone');
   },
 };

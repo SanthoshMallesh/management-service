@@ -1,32 +1,31 @@
 import {
-  BelongsTo,
   Column,
   CreatedAt,
   Default,
   ForeignKey,
   Model,
   Table,
+  UpdatedAt,
 } from 'sequelize-typescript';
-import {Country, MarketingProgram} from '.';
+import {Country} from './country.model';
 
 @Table({
-  tableName: 'channel',
+  tableName: 'time_zone',
   timestamps: true,
 })
-export class Channel extends Model<Channel> {
+export class TimeZone extends Model<TimeZone> {
   @Column
-  name: string;
-
-  @ForeignKey(() => MarketingProgram)
-  @Column
-  mktngPgmId: number;
+  timeZoneName: string;
 
   @ForeignKey(() => Country)
   @Column
   countryId: number;
 
   @Column
-  description: string;
+  gtmOffset: string;
+
+  @Column
+  timeZone: string;
 
   @Default(true)
   @Column
@@ -41,12 +40,6 @@ export class Channel extends Model<Channel> {
   @Column
   updatedBy: string;
 
-  @CreatedAt
+  @UpdatedAt
   updatedDate: Date;
-
-  @BelongsTo(() => MarketingProgram)
-  marketingProgram: MarketingProgram;
-
-  @BelongsTo(() => Country)
-  country: Country;
 }
