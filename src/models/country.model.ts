@@ -18,6 +18,9 @@ export class Country extends Model<Country> {
   @Column
   name: string;
 
+  @Column
+  isoCode: string;
+
   @ForeignKey(() => Locale)
   @Column
   localeId: number;

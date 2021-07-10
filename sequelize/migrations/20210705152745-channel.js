@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.createTable('channel', {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        autoIncrement: false,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
