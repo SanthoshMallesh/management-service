@@ -7,14 +7,17 @@ import {
   ForeignKey,
   HasOne,
   Model,
+  Scopes,
   Table,
   UpdatedAt,
 } from 'sequelize-typescript';
 import {Campaign, Voucher} from '.';
+import {incentiveScopes} from '../scopes';
 @Table({
   tableName: 'incentive',
   timestamps: true,
 })
+@Scopes(incentiveScopes)
 export class Incentive extends Model<Incentive> {
   @ForeignKey(() => Campaign)
   @Column

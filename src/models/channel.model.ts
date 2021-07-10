@@ -1,18 +1,23 @@
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   CreatedAt,
   Default,
   ForeignKey,
   Model,
+  Scopes,
   Table,
+  UpdatedAt,
 } from 'sequelize-typescript';
-import {Country, MarketingProgram} from '.';
+import {Campaign, CampaignChannel, Country, MarketingProgram} from '.';
+import {channelScopes} from '../scopes';
 
 @Table({
   tableName: 'channel',
   timestamps: true,
 })
+@Scopes(channelScopes)
 export class Channel extends Model<Channel> {
   @Column
   name: string;
@@ -41,11 +46,14 @@ export class Channel extends Model<Channel> {
   @Column
   updatedBy: string;
 
-  @CreatedAt
+  @UpdatedAt
   updatedDate: Date;
 
   @BelongsTo(() => MarketingProgram)
   marketingProgram: MarketingProgram;
+
+  @BelongsToMany(() => Campaign, () => CampaignChannel)
+  campaign: CampaignChannel[];
 
   @BelongsTo(() => Country)
   country: Country;

@@ -39,9 +39,6 @@ export class CampaignChannel extends Model<CampaignChannel> {
   @UpdatedAt
   updatedDate: Date;
 
-  @BelongsTo(() => Campaign)
-  campaign: Campaign;
-
   @BelongsTo(() => Channel)
   channel: Channel;
 }

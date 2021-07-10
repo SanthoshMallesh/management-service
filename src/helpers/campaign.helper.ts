@@ -1,7 +1,7 @@
 /* error-codes */
 import {CampaignErrorCode} from '../error-codes/campaign.errorCode';
 /* models */
-import {Campaign, Channel} from '../models';
+import {Campaign, Channel, Incentive} from '../models';
 
 export class CampaignHelper {
   private requiredValidationErrors: {[index: string]: string} = {};
@@ -85,5 +85,24 @@ export class CampaignHelper {
         },
       },
     );
+  }
+
+  /**
+   * Update Incentives Count
+   *
+   * @param campaignId
+   */
+  async updateIncentivesCount(campaignId: number) {
+    const incentiveCount = await Incentive.count({
+      where: {campaignId},
+    });
+
+    const updateCampaign = await Campaign.update(
+      {incentiveCount},
+      {where: {id: campaignId}},
+    );
+
+    await this.validateForPublish(campaignId);
+    return updateCampaign;
   }
 }

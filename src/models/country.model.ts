@@ -6,6 +6,7 @@ import {
   HasOne,
   Model,
   Table,
+  UpdatedAt,
 } from 'sequelize-typescript';
 import {Currency, Locale} from '.';
 import {TimeZone} from './timeZone.model';
@@ -38,7 +39,7 @@ export class Country extends Model<Country> {
   @Column
   updatedBy: string;
 
-  @CreatedAt
+  @UpdatedAt
   updatedDate: Date;
 
   @BelongsTo(() => Locale)
