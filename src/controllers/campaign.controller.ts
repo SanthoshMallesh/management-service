@@ -78,7 +78,7 @@ export class CampaignController {
     @requestBody() campaign: CampaignDeleteRequestType,
   ): Promise<{message: string}> {
     const campaignIds = Array.from(new Set(campaign.ids));
-    const campaign1 = await this.campaignBL.deleteCampaigns(campaignIds);
+    await this.campaignBL.deleteCampaigns(campaignIds);
     return {message: 'Campaign deleted successfully'};
   }
 }
