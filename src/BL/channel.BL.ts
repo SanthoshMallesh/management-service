@@ -20,7 +20,11 @@ export class ChannelBL {
    * @param channel
    * @param distributions
    */
-  async processChannel(channel: Channel, distributions: string[] = []) {
+  async processChannel(
+    channel: Channel,
+    distributions: string[] = [],
+    reports: string[] = [],
+  ) {
     const {marketingProgram, id, country} = channel;
     const brand = marketingProgram.brand ? marketingProgram.brand : null;
     const currency = country.currency ? country.currency : null;
@@ -62,6 +66,7 @@ export class ChannelBL {
       locales,
       timeZone,
       distributions,
+      reports,
     };
   }
 
@@ -84,20 +89,24 @@ export class ChannelBL {
     const channelIds = channels.map(channel => channel.id);
 
     const appConfigs: AppConfig[] = await AppConfig.findAll({
-      attributes: ['configValue', 'moduleId'],
+      attributes: ['configValue', 'moduleId', 'configName'],
       where: {
         module: 'Channel',
-        configName: 'distributions',
+        configName: {$in: ['reports', 'distributions']},
         moduleId: {$in: [2869]},
       },
     });
 
     const distributions: {[channelId: number]: string[]} = {};
-
+    const reports: {[channelId: number]: string[]} = {};
     for (const appConfig of appConfigs) {
-      distributions[appConfig.moduleId] = (appConfig.configValue || '').split(
-        ',',
-      );
+      if (appConfig.configName === 'distributions') {
+        distributions[appConfig.moduleId] = (appConfig.configValue || '').split(
+          ',',
+        );
+      } else {
+        reports[appConfig.moduleId] = (appConfig.configValue || '').split(',');
+      }
     }
 
     return (await Promise.all(
@@ -106,6 +115,7 @@ export class ChannelBL {
           (await this.processChannel(
             channel,
             distributions[channel.id],
+            reports[channel.id],
           )) as unknown as Channel,
       ),
     )) as Channel[];

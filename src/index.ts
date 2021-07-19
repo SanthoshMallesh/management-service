@@ -3,6 +3,13 @@ import {ApplicationConfig, ManagementServiceApplication} from './application';
 export * from './application';
 
 export async function main(options: ApplicationConfig = {}) {
+  options.rest = {
+    ...options.rest,
+    //cros: {},
+    expressSettings: {
+      'x-powered-by': false,
+    },
+  };
   const app = new ManagementServiceApplication(options);
   await app.boot();
   await app.start();

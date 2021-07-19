@@ -29,12 +29,22 @@ export class MySequence implements SequenceHandler {
     const {response} = context;
     try {
       const {request} = context;
+      response.header('Access-Control-Allow-Origin', '*');
+      response.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept',
+      );
       const correlationId = await this.correlationIdProvider.value();
       this.logger.setCorrelationId(correlationId as string);
-      const route = this.findRoute(request);
-      const args = await this.parseParams(request, route);
-      const result = await this.invoke(route, args);
-      this.send(response, result);
+      if (request.method == 'OPTIONS') {
+        response.status(200);
+        this.send(response, 'ok');
+      } else {
+        const route = this.findRoute(request);
+        const args = await this.parseParams(request, route);
+        const result = await this.invoke(route, args);
+        this.send(response, result);
+      }
     } catch (err) {
       if (err.errors) {
         response.status(err.status);
