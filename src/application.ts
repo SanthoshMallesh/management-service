@@ -10,12 +10,13 @@ import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 /* Constant */
 import {Constants} from './constants';
-import {AppConfigHelper} from './helpers';
+import {AppConfigHelper} from './helpers/appConfig.helper';
+import {LocaleHelper} from './helpers/locale.helper';
+import {ReportHelper} from './helpers/report.helper';
 import sequelize from './sequelize';
 import {MySequence} from './sequence';
 import {CorrelationIdProvider} from './utils/correlationId-provider';
 import {Logger} from './utils/logger';
-
 export {ApplicationConfig};
 
 let Global: ManagementServiceApplication;
@@ -68,6 +69,8 @@ export class ManagementServiceApplication extends BootMixin(
      * Helpers
      */
     this.bind('helper.appConfig').to(AppConfigHelper);
+    this.bind('helper.report').to(ReportHelper);
+    this.bind('helper.locale').to(LocaleHelper);
   }
 }
 
