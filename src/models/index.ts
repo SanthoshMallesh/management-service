@@ -4,6 +4,7 @@ export * from './campaign.model';
 export * from './campaignChannel.model';
 export * from './channel.model';
 export * from './country.model';
+export * from './coupon.model';
 export * from './currency.model';
 export * from './fieldConfig.model';
 export * from './incentive.model';

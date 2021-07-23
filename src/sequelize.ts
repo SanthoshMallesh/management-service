@@ -8,6 +8,7 @@ import {
   CampaignChannel,
   Channel,
   Country,
+  Coupon,
   Currency,
   FieldConfig,
   Incentive,
@@ -65,6 +66,7 @@ export default class SequelizeDB {
       Currency,
       MarketingProgram,
       TimeZone,
+      Coupon,
     ]);
 
     return sequelize;
