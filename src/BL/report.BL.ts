@@ -118,6 +118,97 @@ export class ReportBL {
   }
 
   /**
+   * Get Rsc Voucher Consumer CountData
+   * @param filters
+   */
+  async getRscVoucherConsumerCountData(filters: ReportFilters) {
+    this.logger.info('getRscVoucherConsumerCountData: ', filters);
+    const {
+      mktngPgmNbr,
+      distributionType,
+      startDateTime,
+      endDateTime,
+      channelIds,
+      filterBy,
+    } = filters;
+
+    const dateColumn = filterBy ?? 'availedOn';
+
+    const count = await Coupon.count({
+      where: {
+        mktngPgmNbr,
+        distributionType,
+        channelId: channelIds
+          ? {
+              $in: channelIds.split(','),
+            }
+          : {
+              $ne: null,
+            },
+        $and: [
+          {
+            [dateColumn]: {$gte: startDateTime},
+          },
+          {
+            [dateColumn]: {$lte: endDateTime},
+          },
+        ],
+      },
+      distinct: true,
+      col: 'Coupon.consumerId',
+    });
+
+    return count;
+  }
+
+  /**
+   * Get Retailer Count Data
+   * @param filters
+   * @returns
+   */
+  async getRetailerCountData(filters: ReportFilters) {
+    this.logger.info('getRetailerCountData: ', filters);
+    const {
+      mktngPgmNbr,
+      distributionType,
+      startDateTime,
+      endDateTime,
+      channelIds,
+      filterBy,
+    } = filters;
+
+    const dateColumn = filterBy ?? 'availedOn';
+
+    const count = await Coupon.findAll({
+      attributes: [[Sequelize.literal('COUNT(1)'), 'count'], 'retailer'],
+      where: {
+        mktngPgmNbr,
+        distributionType,
+        channelId: channelIds
+          ? {
+              $in: channelIds.split(','),
+            }
+          : {
+              $ne: null,
+            },
+        $and: [
+          {
+            [dateColumn]: {$gte: startDateTime},
+          },
+          {
+            [dateColumn]: {$lte: endDateTime},
+          },
+        ],
+      },
+      group: ['retailer'],
+      order: [['count', 'DESC']],
+      limit: 5,
+    });
+
+    return count;
+  }
+
+  /**
    * Get Rsc Voucher Data
    * @param filters
    */
@@ -131,7 +222,38 @@ export class ReportBL {
         this.getTotalCashbackPaid(filters),
       ]);
 
-    return {reservedCoupons, redeemedCoupons, totalCashbackPaid};
+    if (!filters.groupByDate) {
+      const [reservedConsumnerCount, redeemedConsumnerCount, retailerDetails] =
+        await Promise.all([
+          this.getRscVoucherConsumerCountData(filters),
+          this.getRscVoucherConsumerCountData({
+            ...filters,
+            filterBy: 'redeemedOn',
+          }),
+          this.getRetailerCountData(filters),
+        ]);
+
+      const retailers = retailerDetails || [];
+      const couponLoadedByRetailers = retailers.reduce(
+        (a: number, b: Coupon) =>
+          a + +(b.toJSON() as unknown as {count: string}).count,
+        0,
+      );
+
+      results = {
+        reservedConsumners: reservedConsumnerCount || 0,
+        redeemedConsumners: redeemedConsumnerCount || 0,
+        retailers: [
+          ...retailers,
+          {
+            count: (reservedCoupons - couponLoadedByRetailers).toString(),
+            retailers: 'Others',
+          },
+        ],
+      };
+    }
+
+    return {reservedCoupons, redeemedCoupons, totalCashbackPaid, ...results};
   }
 
   /**
