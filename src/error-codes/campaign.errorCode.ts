@@ -9,5 +9,7 @@ export class CampaignErrorCode extends DefaultErrorCode {
     BUDGET_AMOUNT_REQUIRED: 'Budget amount required',
     DRAFT_CAMPAIGNS_NOT_FOUND: 'Campaign %s should be in draft status',
     CAMPAIGNS_REQUIRED: 'Campaign is required',
+    INVALID_SORT: 'Unable to sort campaign by %s',
+    INVALID_SORT_DIRECTION: 'Invalid sort direction %s',
   };
 }

@@ -5,6 +5,7 @@ import {bindObjects} from '../application';
 /* Constant */
 import {Constants} from '../constants';
 import {workFlowStatus} from '../constants/workFlowStatus';
+import {DefaultErrorCode} from '../error-codes';
 /* error-codes */
 import {CampaignErrorCode} from '../error-codes/campaign.errorCode';
 /* Helper */
@@ -14,12 +15,11 @@ import {
   Campaign,
   CampaignChannel,
   Channel,
-  Sequelize,
   SequelizeTypescript,
 } from '../models';
 /* Types */
 import {CampaignRequestType} from '../types/campaign.type';
-
+import Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 export interface ChannelList {
@@ -391,6 +391,347 @@ export class CampaignBL {
       }
     } catch (err) {
       this.logger.error('Campaign delete : ', err);
+      throw CampaignErrorCode.error(err.message);
+    }
+  }
+
+  /**
+   * Convert Filter Param To Array
+   * @param filter
+   * @param filterQueryField
+   * @param isNumber
+   * @returns
+   */
+  private async convertFilterParamToArray(
+    filter: object,
+    filterQueryField: string,
+    isNumber: boolean,
+  ) {
+    const filterOptions = filter as {[prop: string]: {[prop: string]: string}};
+
+    if (filterOptions[filterQueryField] && filterOptions[filterQueryField].in) {
+      return filterOptions[filterQueryField].in.split(',').map(queryParam => {
+        return isNumber ? +queryParam : queryParam;
+      });
+    }
+
+    return [];
+  }
+
+  private async convertFilterQueryParamToArray(
+    filter: object,
+    filterQueryField: string,
+    isNumber: boolean,
+  ) {
+    const filterOptions = filter as {[prop: string]: {[prop: string]: string}};
+
+    if (filterOptions[filterQueryField] && filterOptions[filterQueryField].in) {
+      return filterOptions[filterQueryField].in.split(',').map(queryParam => {
+        return isNumber ? +queryParam : queryParam;
+      });
+    }
+
+    return [];
+  }
+
+  /**
+   * Get Search Filter Query
+   * @param type
+   * @param filterObj
+   * @param filter
+   * @param search
+   * @param status
+   */
+  private async getSearchFilterQuery(
+    type: string,
+    filterObj: Sequelize.WhereAttributeHash | null,
+    filter?: object,
+    search?: string,
+    status?: number,
+  ) {
+    const campaignWhere: Sequelize.WhereAttributeHash = {};
+    const incentiveWhere: Sequelize.WhereAttributeHash = {};
+
+    const userChannelIds = [2869];
+    const userMpIds = [20];
+
+    let channelIds: number[] = [];
+    let mpIds: number[] = [];
+    let distributionTypes: string[] = [];
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let distributionTypeCondition: any = new Object({});
+
+    const nameSearchCondition = [];
+
+    if (type && type.toUpperCase() === 'INCENTIVE') {
+      if (search) {
+        if (parseInt(search, 10).toString() === search.replace(/^0+/, '')) {
+          nameSearchCondition.push({id: `${parseInt(search, 10)}`});
+          nameSearchCondition.push({incentiveId: {[Op.like]: `%${search}%`}});
+        }
+        nameSearchCondition.push({name: {[Op.iLike]: `%${search}%`}});
+        incentiveWhere.$or = nameSearchCondition;
+      }
+
+      if (filterObj) {
+        incentiveWhere.$and = filterObj;
+      }
+
+      if (status) {
+        incentiveWhere.workFlowStatus = status;
+      }
+
+      if (filter) {
+        distributionTypes = <string[]>(
+          await this.convertFilterParamToArray(
+            filter,
+            'distributionType',
+            false,
+          )
+        );
+      }
+
+      if (distributionTypes.length !== 0) {
+        distributionTypeCondition = {
+          $or: distributionTypes.map(disType => ({
+            id: {
+              $in: Sequelize.literal(
+                `(SELECT "incentiveId" FROM ${disType.toLowerCase()})`,
+              ),
+            },
+          })),
+        };
+      }
+
+      const filterCondition = [];
+      if (filterObj && Object.keys(filterObj).length) {
+        filterCondition.push(filterObj);
+      }
+      if (
+        distributionTypeCondition &&
+        Object.keys(distributionTypeCondition).length
+      ) {
+        filterCondition.push(distributionTypeCondition);
+      }
+
+      incentiveWhere.$and = filterCondition;
+
+      const QueryGenerator = this.sequelize.getQueryInterface() //eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .QueryGenerator as any;
+
+      const incentiveSubQuery: string = QueryGenerator.selectQuery(
+        'incentive',
+        {
+          attributes: ['campaignId'],
+          where: incentiveWhere,
+        },
+      );
+
+      campaignWhere.id = {
+        $in: Sequelize.literal(`(${incentiveSubQuery.slice(0, -1)})`),
+      };
+    } else if (type && type.toUpperCase() === 'CAMPAIGN') {
+      if (search) {
+        if (parseInt(search, 10).toString() === search) {
+          nameSearchCondition.push({id: parseInt(search, 10)});
+        }
+        nameSearchCondition.push({
+          id: {
+            [Op.in]: Sequelize.literal(`
+            (with getFirstKey as(SELECT keys FROM (SELECT keys,row_number() over(order by (select 1)) rn FROM (SELECT name,json_object_keys(name) keys FROM campaign) t1) t1 where rn = 1)select id from campaign where CAST(name->(select keys from getFirstKey) as text) iLike '%${search}%')`),
+          },
+        });
+        campaignWhere.$or = nameSearchCondition;
+      }
+      if (filterObj) {
+        campaignWhere.$and = filterObj;
+      }
+
+      if (status) {
+        campaignWhere.workFlowStatus = status;
+      }
+    }
+
+    if (filter) {
+      channelIds = <number[]>(
+        await this.convertFilterQueryParamToArray(filter, 'channel', true)
+      );
+      mpIds = <number[]>(
+        await this.convertFilterQueryParamToArray(filter, 'mp', true)
+      );
+    }
+    const allowedChannelIDs = channelIds.filter(channelId => {
+      userChannelIds.includes(channelId);
+    });
+
+    const allowedMPIDs = mpIds.filter(mpId => userMpIds.includes(mpId));
+
+    const channelIdsList =
+      allowedChannelIDs.length > 0 ? allowedChannelIDs : userChannelIds;
+
+    const mpidsList = allowedMPIDs.length > 0 ? allowedMPIDs : userMpIds;
+
+    campaignWhere['$Campaign.id$'] = {
+      $in: Sequelize.literal(
+        `(SELECT campaign.id from campaign INNER JOIN campaign_channel on campaign_channel."campaignId" = campaign.id INNER JOIN channel on channel.id = campaign_channel."channelId" where campaign_channel."channelId" IN (${channelIdsList.join(
+          ',',
+        )}) AND channel."mktngPgmId" IN (${mpidsList.join(',')}))`,
+      ),
+    };
+
+    return {
+      campaignWhere,
+      channelIds: channelIdsList,
+      mpIds: mpidsList,
+    };
+  }
+
+  formatFilter(
+    filter?: object,
+    allowedFilters: string[] = [],
+    ignoredFilters: string[] = [],
+  ) {
+    if (!filter) {
+      return null;
+    }
+
+    const filterParams = Object.keys(filter);
+
+    const additionalFilters = filterParams.filter(filterParam => {
+      if (!ignoredFilters.includes(filterParam)) {
+        return !allowedFilters.includes(filterParam);
+      }
+    });
+
+    if (additionalFilters.length > 0) {
+      throw DefaultErrorCode.error('INVALID_FILTER', [
+        additionalFilters.join(', '),
+      ]);
+    }
+
+    const whereFilter = {} as Sequelize.WhereAttributeHash;
+    const filterObject = filter as {
+      [index: string]: string | {[index: string]: string};
+    };
+
+    filterParams.forEach(filterParam => {
+      if (!ignoredFilters.includes(filterParam)) {
+        const filterValue = filterObject[filterParam];
+        if (typeof filterValue == 'string' && filterValue) {
+          whereFilter[filterParam] = filterValue;
+        } else if (typeof filterValue === 'object') {
+          const key = Object.keys(filterValue)[0];
+
+          let value: string | string[] = filterValue[key];
+          if (value) {
+            if (['in', 'notIn'].includes(key)) {
+              value = filterValue[key].split(',');
+            }
+
+            whereFilter[filterParam] = {
+              [`${key}`]: value,
+            };
+          }
+        }
+      }
+    });
+
+    return whereFilter;
+  }
+
+  /**
+   * Campaign List
+   * @param params
+   */
+  async list(params: {
+    sort: string;
+    sortDir: string;
+    type: string;
+    page: number;
+    limit: number;
+    status?: number;
+    search?: string;
+    filter?: object;
+  }) {
+    const {sort, sortDir, type, page, limit, status, search, filter} = params;
+
+    const sortableFields = {
+      id: {column: 'id'},
+      name: {column: 'name'},
+      startDate: {column: 'startDateTime'},
+      endDate: {column: 'endDateTime'},
+      updatedDate: {column: 'updatedDate'},
+      updatedBy: {column: 'updatedBy'},
+    };
+
+    if (!Object.keys(sortableFields).includes(sort)) {
+      throw CampaignErrorCode.error('INVALID_SORT', [sort]);
+    }
+
+    const sortOrders = ['ASC', 'DESC'];
+
+    if (!sortOrders.includes(sortDir.toUpperCase())) {
+      throw CampaignErrorCode.error('INVALID_SORT_DIRECTION', [sortDir]);
+    }
+
+    const filterObj = this.formatFilter(
+      filter,
+      ['startDateTime', 'endDateTime', 'workFlowStatus', 'campaignType'],
+      ['channel', 'mp', 'distributionType'],
+    );
+
+    let statusSort = null;
+    if (sort === 'status') {
+      const statusOrder = Object.values(this.constants.statuses);
+      if (sortDir.toUpperCase() === 'DESC') {
+        statusOrder.reverse();
+      }
+
+      statusSort = Sequelize.literal(
+        `CASE ${statusOrder
+          .map(
+            (statusId, index) =>
+              `WHEN "Campaign"."workFlowStatus" = ${statusId} THEN ${index}`,
+          )
+          .join(' ')} END`,
+      );
+    }
+
+    const campaignAttributes = [
+      'id',
+      'name',
+      'description',
+      'startDateTime',
+      'endDateTime',
+    ];
+
+    try {
+      const filterQueryDetails = await this.getSearchFilterQuery(
+        type,
+        filterObj,
+        filter,
+        search,
+        status,
+      );
+
+      const count = await Campaign.scope('includeEverything').count({
+        where: filterQueryDetails.campaignWhere,
+        distinct: true,
+        col: 'Campaign.id',
+      });
+
+      const campaigns = await Campaign.scope('includeEverything').findAll({
+        attributes: campaignAttributes,
+        offset: (page - 1) * limit,
+        where: filterQueryDetails.campaignWhere,
+        limit,
+      });
+
+      const data = campaigns.map(CampaignBL.processCampaign);
+
+      return {count, page, limit, totalPages: Math.ceil(count / limit), data};
+    } catch (err) {
+      this.logger.error('Campaign List : ', err);
       throw CampaignErrorCode.error(err.message);
     }
   }

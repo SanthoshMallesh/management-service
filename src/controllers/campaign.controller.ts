@@ -48,6 +48,35 @@ export class CampaignController {
     };
   }
 
+  @get('/')
+  async list(
+    @param.query.number('page') page = 1,
+    @param.query.number('limit') limit = 10,
+    @param.query.string('sort') sort = 'updatedDate',
+    @param.query.string('sortDir') sortDir = 'desc',
+    @param.query.string('type') type: string,
+    @param.query.number('status') status?: number,
+    @param.query.string('search') search?: string,
+    @param.query.object('filter') filter?: object,
+  ): Promise<{
+    count: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    data: ResponseCampaign[];
+  }> {
+    return this.campaignBL.list({
+      page,
+      limit,
+      sort,
+      sortDir,
+      type,
+      status,
+      search,
+      filter,
+    });
+  }
+
   @put('/{id}')
   async update(
     @param.path.number('id') id: number,
