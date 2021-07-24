@@ -64,7 +64,7 @@ export class ReportGenerationBL {
     );
 
     const fileName = `Report_${
-      channel.marketingProgram.mktngPrmNbr
+      channel.marketingProgram.mktngPgmNbr
     }_Incentives_${moment(date).format('MM_DD_YYYY')}.xlsx`;
 
     return {fileName, reportBuffer};

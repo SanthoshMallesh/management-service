@@ -17,13 +17,13 @@ import {Brand, Channel, Country} from '.';
 })
 export class MarketingProgram extends Model<MarketingProgram> {
   @Column
-  mktngPrmNbr: number;
+  mktngPgmNbr: number;
 
   @Column
   code: string;
 
   @Column
-  mktngPrmName: string;
+  mktngPgmName: string;
 
   @Column
   mktngPgmDesc: string;

@@ -105,7 +105,7 @@ export class ReportHelper {
       include: [
         {
           as: 'marketingProgram',
-          attributes: ['mktngPrmNbr', 'mktngPrmName'],
+          attributes: ['mktngPgmNbr', 'mktngPgmName'],
           model: MarketingProgram,
           required: true,
           include: [
@@ -302,7 +302,7 @@ export class ReportHelper {
     const ws = XLSX.utils.json_to_sheet(
       [
         {
-          Market: marketingProgram.mktngPrmName,
+          Market: marketingProgram.mktngPgmName,
           Date: momentDate(date).format('DD MMM,YYYY'),
         },
       ],

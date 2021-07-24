@@ -9,13 +9,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      mktngPrmNbr: {
+      mktngPgmNbr: {
         type: Sequelize.INTEGER,
       },
       code: {
         type: Sequelize.STRING,
       },
-      mktngPrmName: {
+      mktngPgmName: {
         type: Sequelize.STRING,
       },
       mktngPgmDesc: {

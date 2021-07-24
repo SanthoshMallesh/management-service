@@ -53,8 +53,8 @@ export class ChannelBL {
       marketingProgram: marketingProgram
         ? {
             id: marketingProgram.id,
-            pgMpId: marketingProgram.mktngPrmNbr,
-            name: marketingProgram.mktngPrmName,
+            pgMpId: marketingProgram.mktngPgmNbr,
+            name: marketingProgram.mktngPgmName,
             description: marketingProgram.mktngPgmDesc,
           }
         : null,
@@ -80,7 +80,7 @@ export class ChannelBL {
       where: {
         enabled: true,
         id: {$in: [2869]},
-        '$marketingProgram.mktngPrmNbr$': {
+        '$marketingProgram.mktngPgmNbr$': {
           $in: [249],
         },
       },

@@ -13,7 +13,7 @@ export function channelScopes() {
       include: [
         {
           as: 'marketingProgram',
-          attributes: ['id', 'mktngPrmNbr', 'mktngPrmName', 'mktngPgmDesc'],
+          attributes: ['id', 'mktngPgmNbr', 'mktngPgmName', 'mktngPgmDesc'],
           model: MarketingProgram,
           required: false,
           include: [
