@@ -105,7 +105,7 @@ export class ImageController {
     }
   }
 
-  @get('/incentive/{imageName}')
+  @get('/blob/{imageName}')
   async getImageStream(
     @param.path.string('imageName') imageName: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
