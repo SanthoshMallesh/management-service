@@ -16,6 +16,7 @@ import {
   CampaignChannel,
   Channel,
   SequelizeTypescript,
+  WorkFlow,
 } from '../models';
 /* Types */
 import {CampaignRequestType} from '../types/campaign.type';
@@ -26,6 +27,11 @@ export interface ChannelList {
   id: number;
   name: string;
 }
+
+interface OptionInterface {
+  id: number;
+  name: string;
+}
 export interface ResponseCampaign {
   id: number;
   name: string;
@@ -33,13 +39,26 @@ export interface ResponseCampaign {
   startDate: Date;
   endDate: Date;
   budgetAmount: number;
+  budgetCode: string;
+  webStatus: OptionInterface | null;
+  requesterAction: OptionInterface | null;
+  approverAction: OptionInterface | null;
+  workflowStatus: number;
+  campaignType: string;
+  channels: ChannelList[];
+  campaignImage: string;
+  isEdited: boolean | null;
+  isValid: boolean;
+  consumerParticipationLimit: number;
+  campaignrParticipationLimit: number | null;
+  timeZoneAbbr: string | null;
+  timeZone: string | null;
+  incentiveCount: number | null;
+  childrenCampaigns?: ResponseCampaign[] | null;
   createdBy: string;
   updatedBy: string;
   createdDate: Date;
   updatedDate: Date;
-  workFlowStatus: number;
-  campaignType: string;
-  channels: ChannelList[];
 }
 
 export class CampaignBL {
@@ -342,16 +361,36 @@ export class CampaignBL {
       startDate: campaign.startDateTime,
       endDate: campaign.endDateTime,
       budgetAmount: campaign.budgetAmount,
-      createdBy: campaign.createdBy,
-      updatedBy: campaign.updatedBy,
-      createdDate: campaign.createdDate,
-      updatedDate: campaign.updatedDate,
-      workFlowStatus: campaign.workflowStatus,
+      budgetCode: campaign.budgetCode,
+      workflowStatus: campaign.workflowStatus,
+      incentiveCount: campaign.incentiveCount,
+      campaignImage: campaign.campaignImage,
       campaignType: campaign.campaignType,
+      timeZoneAbbr: campaign.timeZone ? campaign.timeZone.timeZoneName : null,
+      timeZone: campaign.timeZone ? campaign.timeZone.timeZoneName : null,
       channels: campaign.channels.map((channel: Channel) => ({
         id: channel.id,
         name: channel.name,
       })),
+      requesterAction: campaign.requester
+        ? {id: campaign.requester.id, name: campaign.requester.status}
+        : null,
+      approverAction: campaign.approver
+        ? {id: campaign.approver.id, name: campaign.approver.status}
+        : null,
+      webStatus: campaign.status
+        ? {id: campaign.status.id, name: campaign.status.status}
+        : null,
+      isEdited: campaign.isEdited,
+      isValid: campaign.isValid,
+      consumerParticipationLimit: campaign.consumerParticipationLimit,
+      campaignrParticipationLimit: campaign.consumerParticipationLimit
+        ? campaign.campaignrParticipationLimit
+        : null,
+      createdBy: campaign.createdBy,
+      updatedBy: campaign.updatedBy,
+      createdDate: campaign.createdDate,
+      updatedDate: campaign.updatedDate,
     };
 
     return data;
@@ -564,7 +603,7 @@ export class CampaignBL {
       }
 
       if (status) {
-        campaignWhere.workFlowStatus = status;
+        campaignWhere.webStatus = status;
       }
     }
 
@@ -676,6 +715,7 @@ export class CampaignBL {
       name: {column: 'name'},
       startDate: {column: 'startDateTime'},
       endDate: {column: 'endDateTime'},
+      status: {model: {model: WorkFlow, as: 'status'}, column: 'status'},
       updatedDate: {column: 'updatedDate'},
       updatedBy: {column: 'updatedBy'},
     };
@@ -692,7 +732,7 @@ export class CampaignBL {
 
     const filterObj = this.formatFilter(
       filter,
-      ['startDateTime', 'endDateTime', 'workFlowStatus', 'campaignType'],
+      ['startDateTime', 'endDateTime', 'webStatus', 'campaignType'],
       ['channel', 'mp', 'distributionType'],
     );
 
@@ -707,7 +747,7 @@ export class CampaignBL {
         `CASE ${statusOrder
           .map(
             (statusId, index) =>
-              `WHEN "Campaign"."workFlowStatus" = ${statusId} THEN ${index}`,
+              `WHEN "Campaign"."webStatus" = ${statusId} THEN ${index}`,
           )
           .join(' ')} END`,
       );
@@ -719,6 +759,22 @@ export class CampaignBL {
       'description',
       'startDateTime',
       'endDateTime',
+      'budgetAmount',
+      'budgetCode',
+      'webStatus',
+      'workflowStatus',
+      'requesterAction',
+      'incentiveCount',
+      'isEdited',
+      'isValid',
+      'timeZoneId',
+      'approverAction',
+      'consumerParticipationLimit',
+      'campaignrParticipationLimit',
+      'campaignType',
+      'createdDate',
+      'updatedDate',
+      'createdBy',
     ];
 
     try {
