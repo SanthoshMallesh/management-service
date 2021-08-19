@@ -33,8 +33,40 @@ module.exports = {
       errorDescription: {
         type: Sequelize.JSON,
       },
-      workFlowStatus: {
+      parentCampaignId: {
         type: Sequelize.INTEGER,
+        references: {
+          model: 'campaign',
+          key: 'id',
+        },
+      },
+      requesterAction: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'workFlow',
+          key: 'id',
+        },
+      },
+      approverAction: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'workFlow',
+          key: 'id',
+        },
+      },
+      webStatus: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'workFlow',
+          key: 'id',
+        },
+      },
+      workflowStatus: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'workFlow',
+          key: 'id',
+        },
       },
       incentiveCount: {
         type: Sequelize.INTEGER,

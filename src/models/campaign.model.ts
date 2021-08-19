@@ -56,6 +56,9 @@ export class Campaign extends Model<Campaign> {
   @Column
   campaignImage: string;
 
+  @Column
+  isEdited: boolean;
+
   @ForeignKey(() => WorkFlow)
   @Column
   requesterAction: number;
@@ -67,6 +70,10 @@ export class Campaign extends Model<Campaign> {
   @ForeignKey(() => WorkFlow)
   @Column
   webStatus: number;
+
+  @Default(1)
+  @Column
+  workflowStatus: number;
 
   @Default(false)
   @Column
@@ -100,6 +107,12 @@ export class Campaign extends Model<Campaign> {
   @HasMany(() => CampaignChannel)
   campaignChannels?: CampaignChannel[];
 
+  @BelongsTo(() => CampaignChannel, 'id')
+  campaignChannel: CampaignChannel;
+
+  @BelongsToMany(() => Channel, () => CampaignChannel)
+  channels: Channel[];
+
   @BelongsTo(() => WorkFlow, 'requesterAction')
   requester: WorkFlow;
 
@@ -111,12 +124,6 @@ export class Campaign extends Model<Campaign> {
 
   @BelongsTo(() => WorkFlow, 'webStatus')
   workFlowStatus: WorkFlow;
-
-  @BelongsTo(() => CampaignChannel, 'id')
-  campaignChannel: CampaignChannel;
-
-  @BelongsToMany(() => Channel, () => CampaignChannel)
-  channels: Channel[];
 
   @BelongsTo(() => TimeZone)
   timeZone: TimeZone;

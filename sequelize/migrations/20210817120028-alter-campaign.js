@@ -15,6 +15,9 @@ module.exports = {
       queryInterface.addColumn('campaign', 'campaignImage', {
         type: Sequelize.DataTypes.STRING,
       }),
+      queryInterface.addColumn('campaign', 'isEdited', {
+        type: Sequelize.DataTypes.BOOLEAN,
+      }),
     ]);
   },
 
@@ -24,6 +27,7 @@ module.exports = {
       queryInterface.removeColumn('campaign', 'consumerParticipationLimit'),
       queryInterface.removeColumn('campaign', 'campaignrParticipationLimit'),
       queryInterface.removeColumn('campaign', 'campaignImage'),
+      queryInterface.removeColumn('campaign', 'isEdited'),
     ]);
   },
 };

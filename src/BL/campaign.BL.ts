@@ -15,7 +15,7 @@ import {
   Campaign,
   CampaignChannel,
   Channel,
-  SequelizeTypescript
+  SequelizeTypescript,
 } from '../models';
 /* Types */
 import {CampaignRequestType} from '../types/campaign.type';
@@ -129,11 +129,16 @@ export class CampaignBL {
     this.logger.info('Campaign BL - Campaign create ');
     await this.validateCampaign(campaign);
 
-    const {channels} = campaign;
-
+    const {channels, requesterAction, approverAction, timeZoneId} = campaign;
+    const DRAFT_STATUS = 1;
     campaign = Object.assign({}, campaign, {
       createdBy: 'admin',
       updatedBy: 'admin',
+      requesterAction: requesterAction === 0 ? null : requesterAction,
+      approverAction: approverAction === 0 ? null : approverAction,
+      webStatus: DRAFT_STATUS,
+      timeZoneId: timeZoneId === 0 ? null : timeZoneId,
+      isEdited: true,
     });
     let campaignId = 0;
     try {
@@ -187,23 +192,28 @@ export class CampaignBL {
       attributes: [
         'id',
         'name',
+        'campaignType',
         'description',
         'startDateTime',
         'endDateTime',
-        'incentiveCount',
-        'campaignType',
         'budgetAmount',
         'budgetCode',
         'webStatus',
         'workFlowStatus',
+        'incentiveCount',
         'timeZoneId',
-        'campaignImage',
+        'isValid',
+        'isEdited',
+        'requesterAction',
+        'approverAction',
+        'errorDescription',
         'consumerParticipationLimit',
         'campaignrParticipationLimit',
-        'isValid',
-        'errorDescription',
+        'campaignImage',
         'createdBy',
         'createdDate',
+        'updatedBy',
+        'updatedDate',
       ],
     });
 
@@ -336,7 +346,7 @@ export class CampaignBL {
       updatedBy: campaign.updatedBy,
       createdDate: campaign.createdDate,
       updatedDate: campaign.updatedDate,
-      workFlowStatus: campaign.workFlowStatus,
+      workFlowStatus: campaign.workflowStatus,
       campaignType: campaign.campaignType,
       channels: campaign.channels.map((channel: Channel) => ({
         id: channel.id,

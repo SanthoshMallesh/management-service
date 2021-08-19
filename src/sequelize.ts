@@ -16,6 +16,7 @@ import {
   MarketingProgram,
   TimeZone,
   Voucher,
+  WorkFlow,
 } from './models';
 
 export default class SequelizeDB {
@@ -67,6 +68,7 @@ export default class SequelizeDB {
       MarketingProgram,
       TimeZone,
       Coupon,
+      WorkFlow,
     ]);
 
     return sequelize;
