@@ -14,6 +14,7 @@ import {
 } from 'sequelize-typescript';
 import {CampaignChannel, Channel, Incentive, TimeZone} from '.';
 import {campaignScopes} from '../scopes';
+import {WorkFlow} from './workFlow.model';
 
 @Table({
   tableName: 'campaign',
@@ -21,6 +22,10 @@ import {campaignScopes} from '../scopes';
 })
 @Scopes(campaignScopes)
 export class Campaign extends Model<Campaign> {
+  @ForeignKey(() => Campaign)
+  @Column
+  parentCampaignId: number;
+
   @Column
   name: string;
 
@@ -40,7 +45,28 @@ export class Campaign extends Model<Campaign> {
   budgetAmount: number;
 
   @Column
-  workFlowStatus: number;
+  budgetCode: string;
+
+  @Column
+  consumerParticipationLimit: number;
+
+  @Column
+  campaignrParticipationLimit: number;
+
+  @Column
+  campaignImage: string;
+
+  @ForeignKey(() => WorkFlow)
+  @Column
+  requesterAction: number;
+
+  @ForeignKey(() => WorkFlow)
+  @Column
+  approverAction: number;
+
+  @ForeignKey(() => WorkFlow)
+  @Column
+  webStatus: number;
 
   @Default(false)
   @Column
@@ -73,6 +99,18 @@ export class Campaign extends Model<Campaign> {
 
   @HasMany(() => CampaignChannel)
   campaignChannels?: CampaignChannel[];
+
+  @BelongsTo(() => WorkFlow, 'requesterAction')
+  requester: WorkFlow;
+
+  @BelongsTo(() => WorkFlow, 'approverAction')
+  approver: WorkFlow;
+
+  @BelongsTo(() => WorkFlow, 'webStatus')
+  status: WorkFlow;
+
+  @BelongsTo(() => WorkFlow, 'webStatus')
+  workFlowStatus: WorkFlow;
 
   @BelongsTo(() => CampaignChannel, 'id')
   campaignChannel: CampaignChannel;

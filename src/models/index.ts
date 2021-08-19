@@ -12,6 +12,7 @@ export * from './locale.model';
 export * from './marketingProgram.model';
 export * from './timeZone.model';
 export * from './voucher.model';
+export * from './workFlow.model';
 export {Sequelize, SequelizeTypescript};
 
 import * as Sequelize from 'sequelize';

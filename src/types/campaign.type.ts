@@ -7,6 +7,11 @@ export class CampaignDeleteRequestType extends Model {
 }
 @model()
 export class CampaignRequestType extends Model {
+  @property({
+    type: 'number',
+  })
+  parentCampaignId: number;
+
   @property.array(Number)
   channels: number[];
 
@@ -43,9 +48,52 @@ export class CampaignRequestType extends Model {
   budgetAmount: number;
 
   @property({
+    type: 'string',
+  })
+  budgetCode?: string;
+
+  @property({
     type: 'number',
   })
-  workFlowStatus: number;
+  requesterAction?: number;
+
+  @property({
+    type: 'number',
+  })
+  approverAction?: number;
+
+  @property({
+    type: 'number',
+  })
+  webStatus?: number;
+
+  @property({
+    type: 'number',
+  })
+  workFlowStatus?: number;
+
+  @property({
+    type: 'number',
+  })
+  timeZoneId?: number;
+
+  @property({
+    type: 'string',
+    jsonSchema: {nullable: true},
+  })
+  campaignImage?: string;
+
+  @property({
+    type: 'number',
+    jsonSchema: {nullable: true},
+  })
+  consumerParticipationLimit?: number | null;
+
+  @property({
+    type: 'number',
+    jsonSchema: {nullable: true},
+  })
+  campaignrParticipationLimit?: number | null;
 
   constructor(data?: Partial<CampaignRequestType>) {
     super(data);

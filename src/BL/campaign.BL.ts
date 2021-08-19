@@ -15,7 +15,7 @@ import {
   Campaign,
   CampaignChannel,
   Channel,
-  SequelizeTypescript,
+  SequelizeTypescript
 } from '../models';
 /* Types */
 import {CampaignRequestType} from '../types/campaign.type';
@@ -193,7 +193,13 @@ export class CampaignBL {
         'incentiveCount',
         'campaignType',
         'budgetAmount',
+        'budgetCode',
+        'webStatus',
         'workFlowStatus',
+        'timeZoneId',
+        'campaignImage',
+        'consumerParticipationLimit',
+        'campaignrParticipationLimit',
         'isValid',
         'errorDescription',
         'createdBy',
