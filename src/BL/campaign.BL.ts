@@ -50,7 +50,7 @@ export interface ResponseCampaign {
   isEdited: boolean | null;
   isValid: boolean;
   consumerParticipationLimit: number;
-  campaignrParticipationLimit: number | null;
+  campaignParticipationLimit: number | null;
   timeZoneAbbr: string | null;
   timeZone: string | null;
   incentiveCount: number | null;
@@ -218,7 +218,7 @@ export class CampaignBL {
         'budgetAmount',
         'budgetCode',
         'webStatus',
-        'workFlowStatus',
+        'workflowStatus',
         'incentiveCount',
         'timeZoneId',
         'isValid',
@@ -227,7 +227,7 @@ export class CampaignBL {
         'approverAction',
         'errorDescription',
         'consumerParticipationLimit',
-        'campaignrParticipationLimit',
+        'campaignParticipationLimit',
         'campaignImage',
         'createdBy',
         'createdDate',
@@ -252,7 +252,7 @@ export class CampaignBL {
   async update(campaignId: number, campaign: CampaignRequestType) {
     const campaignDeatails = await Campaign.findOne({
       where: {id: campaignId},
-      attributes: ['id', 'startDateTime', 'endDateTime', 'workFlowStatus'],
+      attributes: ['id', 'startDateTime', 'endDateTime', 'webStatus'],
       include: [
         {
           as: 'channels',
@@ -267,24 +267,22 @@ export class CampaignBL {
       throw CampaignErrorCode.error('CAMPAIGN_NOT_FOUND', [campaignId]);
     }
 
-    const allowedCampaignWorkFlowStatus = [
+    const allowedCampaignWebStatus = [
       this.constants.statuses.DRAFT,
       this.constants.statuses.PUBLISHED,
     ];
 
-    const workFlowStatusCheck = Object.keys(this.constants.statuses).find(
-      key => this.constants.statuses[key] === campaignDeatails.workFlowStatus,
+    const webStatus = Object.keys(this.constants.statuses).find(
+      key => this.constants.statuses[key] === campaignDeatails.webStatus,
     );
-    if (
-      !allowedCampaignWorkFlowStatus.includes(campaignDeatails.workFlowStatus)
-    ) {
+    if (!allowedCampaignWebStatus.includes(campaignDeatails.webStatus)) {
       throw CampaignErrorCode.error('UPDATE_EXPIRED_CAMPAIGN', [
         campaignId,
-        workFlowStatusCheck!,
+        webStatus!,
       ]);
     }
 
-    if (campaignDeatails.workFlowStatus === this.constants.statuses.DRAFT) {
+    if (campaignDeatails.webStatus === this.constants.statuses.DRAFT) {
       await this.validateCampaign(campaign);
     }
 
@@ -301,12 +299,12 @@ export class CampaignBL {
     );
 
     const deleteChannels = existingChannels.filter(
-      (existingChannel: number) => channelIds.indexOf(existingChannels) < 0,
+      (existingChannel: number) => channelIds.indexOf(existingChannel) < 0,
     );
 
     campaign = Object.assign({}, campaign, {
       updatedBy: 'admin',
-      workFlowStatus: workFlowStatus.DRAFT,
+      workflowStatus: workFlowStatus.DRAFT,
     });
 
     let transaction;
@@ -384,8 +382,8 @@ export class CampaignBL {
       isEdited: campaign.isEdited,
       isValid: campaign.isValid,
       consumerParticipationLimit: campaign.consumerParticipationLimit,
-      campaignrParticipationLimit: campaign.consumerParticipationLimit
-        ? campaign.campaignrParticipationLimit
+      campaignParticipationLimit: campaign.campaignParticipationLimit
+        ? campaign.campaignParticipationLimit
         : null,
       createdBy: campaign.createdBy,
       updatedBy: campaign.updatedBy,
@@ -409,7 +407,7 @@ export class CampaignBL {
     const selectedCampaigns = await Campaign.findAll({
       attributes: ['id'],
       where: {
-        workFlowStatus: this.constants.statuses.DRAFT,
+        webStatus: this.constants.statuses.DRAFT,
         id: {[Op.in]: campaignIds},
       },
     });
@@ -770,7 +768,7 @@ export class CampaignBL {
       'timeZoneId',
       'approverAction',
       'consumerParticipationLimit',
-      'campaignrParticipationLimit',
+      'campaignParticipationLimit',
       'campaignType',
       'createdDate',
       'updatedDate',

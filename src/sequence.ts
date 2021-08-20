@@ -34,6 +34,7 @@ export class MySequence implements SequenceHandler {
         'Access-Control-Allow-Headers',
         'Origin, X-Requested-With, Content-Type, Accept',
       );
+      response.header('Access-Control-Allow-Methods', '*');
       const correlationId = await this.correlationIdProvider.value();
       this.logger.setCorrelationId(correlationId as string);
       if (request.method == 'OPTIONS') {

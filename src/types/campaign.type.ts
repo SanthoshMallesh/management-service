@@ -93,7 +93,7 @@ export class CampaignRequestType extends Model {
     type: 'number',
     jsonSchema: {nullable: true},
   })
-  campaignrParticipationLimit?: number | null;
+  campaignParticipationLimit?: number | null;
 
   constructor(data?: Partial<CampaignRequestType>) {
     super(data);

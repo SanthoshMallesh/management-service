@@ -82,13 +82,10 @@ export class CampaignController {
     @param.path.number('id') id: number,
     @requestBody() campaign: CampaignRequestType,
   ): Promise<{message: string; campaignId: number; data: Campaign}> {
+    console.log('CampaignRequestType', JSON.stringify(campaign));
     const updateCampaignId = await this.campaignBL.update(id, campaign);
     await this.campaignBL.validateForPublish(id);
     const campaignDetails = await this.campaignBL.get(updateCampaignId);
-
-    if (this.res) {
-      this.res.status(201);
-    }
     return {
       message: 'Campaign updated successfully',
       campaignId: updateCampaignId,

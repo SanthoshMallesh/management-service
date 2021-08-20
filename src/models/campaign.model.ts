@@ -51,7 +51,7 @@ export class Campaign extends Model<Campaign> {
   consumerParticipationLimit: number;
 
   @Column
-  campaignrParticipationLimit: number;
+  campaignParticipationLimit: number;
 
   @Column
   campaignImage: string;
