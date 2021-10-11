@@ -8,10 +8,10 @@ import {AppConfig, Channel, Locale} from '../models';
 export class ChannelBL {
   constructor() {}
 
-  @inject('logger') private logger: winston.Logger;
+  @inject('logger') public logger: winston.Logger;
 
   @bindObjects('appConfigHelper', AppConfigHelper)
-  private appConfigHelper: AppConfigHelper;
+  public appConfigHelper: AppConfigHelper;
   // @inject('helper.appConfig') protected appConfigHelper: AppConfigHelper;
 
   /**
@@ -25,6 +25,7 @@ export class ChannelBL {
     distributions: string[] = [],
     reports: string[] = [],
   ) {
+    console.log(JSON.stringify(channel));
     const {marketingProgram, id, country} = channel;
     const brand = marketingProgram.brand ? marketingProgram.brand : null;
     const currency = country.currency ? country.currency : null;
